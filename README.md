@@ -26,7 +26,7 @@ func main() {
 
     mux.Handle("/", TestHandler)
 
-	http.ListenAndServe(":8080", duck.WatchContext(mux))
+	http.ListenAndServe(":8080", duck.UseContext(mux))
 }
 
 func TestHandler(rw http.ResponseWriter, req *http.Request) {
