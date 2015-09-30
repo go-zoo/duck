@@ -4,14 +4,14 @@ import (
 	"net/http"
 )
 
-type Writer struct {
+type writer struct {
 	http.ResponseWriter
 	done chan bool
 }
 
-func newWriter(w http.ResponseWriter, req *http.Request) http.ResponseWriter {
-	wrt := Writer{w, make(chan bool)}
-	go func(wrt Writer) {
+func NewWriter(rw http.ResponseWriter, req *http.Request) http.ResponseWriter {
+	wrt := writer{rw, make(chan bool)}
+	go func(wrt writer) {
 		for {
 			select {
 			case <-wrt.done:
@@ -19,22 +19,21 @@ func newWriter(w http.ResponseWriter, req *http.Request) http.ResponseWriter {
 				return
 			default:
 				continue
-
 			}
 		}
 	}(wrt)
 	return wrt
 }
 
-func (w Writer) Write(b []byte) (int, error) {
+func (w writer) Write(b []byte) (int, error) {
 	w.done <- true
 	return w.ResponseWriter.Write(b)
 }
 
-func (w Writer) Header() http.Header {
+func (w writer) Header() http.Header {
 	return w.ResponseWriter.Header()
 }
 
-func (w Writer) WriteHeader(i int) {
+func (w writer) WriteHeader(i int) {
 	w.ResponseWriter.WriteHeader(i)
 }

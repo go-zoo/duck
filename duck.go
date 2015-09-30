@@ -50,8 +50,9 @@ func Clear(req *http.Request) {
 	delete(data, req)
 }
 
-func Watch(next http.HandlerFunc) http.Handler {
+func UseContext(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
-		next(newWriter(rw, req), req)
+		rw = NewWriter(rw, req)
+		next.ServeHTTP(rw, req)
 	})
 }

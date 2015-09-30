@@ -8,14 +8,17 @@ import (
 )
 
 func main() {
-	http.Handle("/", duck.Watch(testHandler))
+	mux := http.NewServeMux()
 
-	http.ListenAndServe(":8080", nil)
+	mux.HandleFunc("/", testHandler)
+
+	http.ListenAndServe(":8080", duck.UseContext(mux))
 }
 
 func testHandler(rw http.ResponseWriter, req *http.Request) {
-	duck.SetContext(req, "key", "value")
-	fmt.Println(duck.GetContext(req, "key").(string))
-	rw.Write([]byte("Response writed"))
-	fmt.Println(len(duck.GetAllContext(req)))
+	rw = duck.NewWriter(rw, req)
+	duck.SetContext(req, "key", req.RequestURI)
+	fmt.Println("Context Size :", len(duck.GetAllContext(req)))
+	rw.Write([]byte("Response writed " + duck.GetContext(req, "key").(string)))
+	fmt.Println("Context Size :", len(duck.GetAllContext(req)))
 }
