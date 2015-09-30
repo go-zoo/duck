@@ -52,7 +52,7 @@ func Clear(req *http.Request) {
 
 func UseContext(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
-		rw = NewWriter(rw, req)
+		defer Clear(req)
 		next.ServeHTTP(rw, req)
 	})
 }
