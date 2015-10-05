@@ -30,14 +30,20 @@ func GetContext(req *http.Request, key interface{}) interface{} {
 	if data[req] == nil {
 		return nil
 	}
-	return data[req].values[key]
+	mutex.RLock()
+	value := data[req].values[key]
+	mutex.RUnlock()
+	return value
 }
 
 func GetAllContext(req *http.Request) map[interface{}]interface{} {
 	if data[req] == nil {
 		return nil
 	}
-	return data[req].values
+	mutex.RLock()
+	values := data[req].values
+	mutex.RUnlock()
+	return values
 }
 
 func DeleteContext(req *http.Request, key interface{}) {
