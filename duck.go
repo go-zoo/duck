@@ -16,7 +16,9 @@ var (
 
 func SetContext(req *http.Request, key, value interface{}) {
 	if data[req] == nil {
+		mutex.Lock()
 		data[req] = &context{values: make(map[interface{}]interface{})}
+		mutex.Unlock()
 	}
 	mutex.Lock()
 	data[req].values[key] = value
