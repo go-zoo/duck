@@ -18,17 +18,15 @@ func SetContext(req *http.Request, key, value interface{}) {
 	mutex.Lock()
 	if data[req] == nil {
 		data[req] = &context{values: make(map[interface{}]interface{})}
-		mutex.Unlock()
 	}
-	mutex.Lock()
 	data[req].values[key] = value
 	mutex.Unlock()
-	return
 }
 
 func GetContext(req *http.Request, key interface{}) interface{} {
 	mutex.RLock()
 	if data[req] == nil {
+		mutex.RUnlock()
 		return nil
 	}
 	value := data[req].values[key]
@@ -39,6 +37,7 @@ func GetContext(req *http.Request, key interface{}) interface{} {
 func GetAllContext(req *http.Request) map[interface{}]interface{} {
 	mutex.RLock()
 	if data[req] == nil {
+		mutex.RUnlock()
 		return nil
 	}
 	values := data[req].values
